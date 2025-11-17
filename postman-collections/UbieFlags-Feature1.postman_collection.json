@@ -1,0 +1,72 @@
+{
+  "info": {
+    "name": "UbieFlags - Feature 1: Basic Flag Management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Flag - Basic",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"key\": \"new_onboarding\",\n  \"name\": \"New Onboarding Flow\",\n  \"description\": \"Enable new user onboarding experience\",\n  \"environment\": \"dev\"\n}"
+        },
+        "url": "{{baseUrl}}/flags"
+      }
+    },
+    {
+      "name": "Create Flag - With Rules",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"key\": \"beta_features\",\n  \"name\": \"Beta Features Rollout\",\n  \"environment\": \"staging\",\n  \"state\": \"live\",\n  \"rules\": {\n    \"operator\": \"AND\",\n    \"conditions\": [\n      {\n        \"field\": \"country\",\n        \"operator\": \"IN\",\n        \"value\": [\"CA\", \"US\", \"UK\"]\n      }\n    ],\n    \"rollout\": {\n      \"percentage\": 50\n    }\n  }\n}"
+        },
+        "url": "{{baseUrl}}/flags"
+      }
+    },
+    {
+      "name": "List All Flags",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/flags"
+      }
+    },
+    {
+      "name": "Get Flag by ID",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/flags/{{flagId}}"
+      }
+    },
+    {
+      "name": "Update Flag",
+      "request": {
+        "method": "PATCH",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"state\": \"live\",\n  \"defaultValue\": true\n}"
+        },
+        "url": "{{baseUrl}}/flags/{{flagId}}"
+      }
+    },
+    {
+      "name": "Delete Flag",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/flags/{{flagId}}"
+      }
+    }
+  ]
+}
