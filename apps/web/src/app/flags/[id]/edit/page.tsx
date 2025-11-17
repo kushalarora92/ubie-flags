@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { UpdateFlagFormData, FlagState, FLAG_STATE_OPTIONS } from '@/constants/flag';
 
 export default function EditFlagPage() {
   const params = useParams();
@@ -12,7 +13,7 @@ export default function EditFlagPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UpdateFlagFormData>({
     name: '',
     description: '',
     state: 'draft',
@@ -66,7 +67,7 @@ export default function EditFlagPage() {
       await api.updateFlag(params.id as string, {
         name: formData.name,
         description: formData.description || undefined,
-        state: formData.state as any,
+        state: formData.state,
         defaultValue: formData.defaultValue,
         rules,
       });
@@ -151,12 +152,12 @@ export default function EditFlagPage() {
             </label>
             <select
               value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value as FlagState })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="draft">Draft</option>
-              <option value="live">Live</option>
-              <option value="deprecated">Deprecated</option>
+              {FLAG_STATE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </div>
 

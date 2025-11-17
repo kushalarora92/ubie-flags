@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import FlagExamples from '@/components/FlagExamples';
 import Link from 'next/link';
+import { CreateFlagFormData, FlagEnvironment, FlagState, FLAG_ENVIRONMENT_OPTIONS, FLAG_STATE_OPTIONS } from '@/constants/flag';
 
 export default function NewFlagPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateFlagFormData>({
     key: '',
     name: '',
     description: '',
@@ -21,14 +22,14 @@ export default function NewFlagPage() {
     rules: '',
   });
 
-  const handleUseTemplate = (templateData: any) => {
+  const handleUseTemplate = (templateData: Partial<CreateFlagFormData>) => {
     setFormData({
-      key: templateData.key,
-      name: templateData.name,
+      key: templateData.key || '',
+      name: templateData.name || '',
       description: templateData.description || '',
-      environment: templateData.environment,
-      state: templateData.state,
-      defaultValue: templateData.defaultValue,
+      environment: templateData.environment || 'dev',
+      state: templateData.state || 'draft',
+      defaultValue: templateData.defaultValue ?? false,
       rules: templateData.rules ? JSON.stringify(templateData.rules, null, 2) : '',
     });
   };
@@ -53,8 +54,8 @@ export default function NewFlagPage() {
         key: formData.key,
         name: formData.name,
         description: formData.description || undefined,
-        environment: formData.environment as any,
-        state: formData.state as any,
+        environment: formData.environment,
+        state: formData.state,
         defaultValue: formData.defaultValue,
         rules,
       });
@@ -129,12 +130,12 @@ export default function NewFlagPage() {
             </label>
             <select
               value={formData.environment}
-              onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, environment: e.target.value as FlagEnvironment })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="dev">Development</option>
-              <option value="staging">Staging</option>
-              <option value="prod">Production</option>
+              {FLAG_ENVIRONMENT_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </div>
 
@@ -144,12 +145,12 @@ export default function NewFlagPage() {
             </label>
             <select
               value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value as FlagState })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="draft">Draft</option>
-              <option value="live">Live</option>
-              <option value="deprecated">Deprecated</option>
+              {FLAG_STATE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </div>
 
