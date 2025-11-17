@@ -184,7 +184,7 @@ export default function EvaluatePage() {
                   <div className="text-sm">
                     <span className="font-medium text-gray-700">Default Value:</span>{' '}
                     <span className="text-gray-900">
-                      {result.explanation.defaultValue ? 'ON' : 'OFF'}
+                      {result.explanation.defaultValue ? 'true' : 'false'}
                     </span>
                   </div>
                   {result.explanation.matchedRule && (
