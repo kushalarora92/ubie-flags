@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { UpdateFlagFormData, FlagState, FLAG_STATE_OPTIONS } from '@/constants/flag';
+import { Button, Select, Alert } from '@/components/ui';
 
 export default function EditFlagPage() {
   const params = useParams();
@@ -56,12 +57,14 @@ export default function EditFlagPage() {
     try {
       // Parse rules if provided
       let rules = undefined;
-      if (formData.rules.trim()) {
+      if (formData.rules && typeof formData.rules === 'string' && formData.rules.trim()) {
         try {
           rules = JSON.parse(formData.rules);
         } catch {
           throw new Error('Invalid JSON in rules field');
         }
+      } else if (formData.rules && typeof formData.rules === 'object') {
+        rules = formData.rules;
       }
 
       await api.updateFlag(params.id as string, {
@@ -87,9 +90,9 @@ export default function EditFlagPage() {
   if (error && !formData.name) {
     return (
       <div className="space-y-4">
-        <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
-          Error: {error}
-        </div>
+        <Alert variant="error">
+          {error}
+        </Alert>
         <Link href="/flags" className="text-blue-600 hover:text-blue-900">
           ← Back to Flags
         </Link>
@@ -110,9 +113,9 @@ export default function EditFlagPage() {
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded p-4 text-red-800">
+        <Alert variant="error" className="mb-4">
           {error}
-        </div>
+        </Alert>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow rounded-lg p-6">
@@ -146,34 +149,24 @@ export default function EditFlagPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              State <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value as FlagState })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {FLAG_STATE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="State"
+            required
+            options={FLAG_STATE_OPTIONS}
+            value={formData.state}
+            onChange={(value) => setFormData({ ...formData, state: value as FlagState })}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Default Value <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.defaultValue ? 'true' : 'false'}
-              onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value === 'true' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="false">false</option>
-              <option value="true">true</option>
-            </select>
-          </div>
+          <Select
+            label="Default Value"
+            required
+            options={[
+              { value: 'false', label: 'false' },
+              { value: 'true', label: 'true' },
+            ]}
+            value={formData.defaultValue ? 'true' : 'false'}
+            onChange={(value) => setFormData({ ...formData, defaultValue: value === 'true' })}
+          />
         </div>
 
         <div>
@@ -181,7 +174,7 @@ export default function EditFlagPage() {
             Rules (JSON)
           </label>
           <textarea
-            value={formData.rules}
+            value={typeof formData.rules === 'string' ? formData.rules : JSON.stringify(formData.rules, null, 2)}
             onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
             rows={15}
@@ -192,18 +185,11 @@ export default function EditFlagPage() {
         </div>
 
         <div className="flex gap-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 cursor-pointer"
-          >
+          <Button type="submit" disabled={saving} variant="primary">
             {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <Link
-            href={`/flags/${params.id}`}
-            className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            Cancel
+          </Button>
+          <Link href={`/flags/${params.id}`}>
+            <Button variant="secondary">Cancel</Button>
           </Link>
         </div>
       </form>

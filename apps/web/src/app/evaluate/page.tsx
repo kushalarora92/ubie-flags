@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api, EvaluationResult } from '@/lib/api';
 import EvaluationExamples from '@/components/EvaluationExamples';
+import { Button, Select, Alert } from '@/components/ui';
+import { FLAG_ENVIRONMENT_OPTIONS } from '@/constants/flag';
 
 export default function EvaluatePage() {
   const searchParams = useSearchParams();
@@ -106,15 +108,11 @@ export default function EvaluatePage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Environment <span className="text-red-500">*</span>
               </label>
-              <select
+              <Select
+                options={FLAG_ENVIRONMENT_OPTIONS}
                 value={formData.environment}
-                onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="dev">Development</option>
-                <option value="staging">Staging</option>
-                <option value="prod">Production</option>
-              </select>
+                onChange={(value) => setFormData({ ...formData, environment: value })}
+              />
             </div>
 
             <div>
@@ -130,13 +128,14 @@ export default function EvaluatePage() {
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+              variant="primary"
+              className="w-full"
             >
               {loading ? 'Evaluating...' : 'Evaluate Flag'}
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -145,10 +144,9 @@ export default function EvaluatePage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Result</h2>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
-              <p className="font-semibold">Error</p>
-              <p className="text-sm mt-1">{error}</p>
-            </div>
+            <Alert variant="error">
+              {error}
+            </Alert>
           )}
 
           {result && (
@@ -163,7 +161,7 @@ export default function EvaluatePage() {
                       : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {result.result ? 'ON ✓' : 'OFF ✗'}
+                  {result.result ? 'true ✓' : 'false ✗'}
                 </span>
               </div>
 

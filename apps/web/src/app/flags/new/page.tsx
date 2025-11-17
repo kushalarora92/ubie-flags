@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import FlagExamples from '@/components/FlagExamples';
 import Link from 'next/link';
 import { CreateFlagFormData, FlagEnvironment, FlagState, FLAG_ENVIRONMENT_OPTIONS, FLAG_STATE_OPTIONS } from '@/constants/flag';
+import { Button, Select, Alert } from '@/components/ui';
 
 export default function NewFlagPage() {
   const router = useRouter();
@@ -42,12 +43,14 @@ export default function NewFlagPage() {
     try {
       // Parse rules if provided
       let rules = undefined;
-      if (formData.rules.trim()) {
+      if (formData.rules && typeof formData.rules === 'string' && formData.rules.trim()) {
         try {
           rules = JSON.parse(formData.rules);
         } catch {
           throw new Error('Invalid JSON in rules field');
         }
+      } else if (formData.rules && typeof formData.rules === 'object') {
+        rules = formData.rules;
       }
 
       await api.createFlag({
@@ -76,9 +79,7 @@ export default function NewFlagPage() {
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded p-4 text-red-800">
-          {error}
-        </div>
+        <Alert variant="error">{error}</Alert>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow rounded-lg p-6">
@@ -124,49 +125,32 @@ export default function NewFlagPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Environment <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.environment}
-              onChange={(e) => setFormData({ ...formData, environment: e.target.value as FlagEnvironment })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {FLAG_ENVIRONMENT_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Environment"
+            required
+            options={FLAG_ENVIRONMENT_OPTIONS}
+            value={formData.environment}
+            onChange={(value) => setFormData({ ...formData, environment: value as FlagEnvironment })}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              State <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value as FlagState })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {FLAG_STATE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="State"
+            required
+            options={FLAG_STATE_OPTIONS}
+            value={formData.state}
+            onChange={(value) => setFormData({ ...formData, state: value as FlagState })}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Default Value <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.defaultValue ? 'true' : 'false'}
-              onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value === 'true' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="false">false</option>
-              <option value="true">true</option>
-            </select>
-          </div>
+          <Select
+            label="Default Value"
+            required
+            options={[
+              { value: 'false', label: 'false' },
+              { value: 'true', label: 'true' },
+            ]}
+            value={formData.defaultValue ? 'true' : 'false'}
+            onChange={(value) => setFormData({ ...formData, defaultValue: value === 'true' })}
+          />
         </div>
 
         <div>
@@ -174,7 +158,7 @@ export default function NewFlagPage() {
             Rules (JSON)
           </label>
           <textarea
-            value={formData.rules}
+            value={typeof formData.rules === 'string' ? formData.rules : JSON.stringify(formData.rules, null, 2)}
             onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
             rows={10}
@@ -195,18 +179,17 @@ export default function NewFlagPage() {
         </div>
 
         <div className="flex gap-4">
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 cursor-pointer"
+            variant="primary"
           >
             {loading ? 'Creating...' : 'Create Flag'}
-          </button>
-          <Link
-            href="/flags"
-            className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            Cancel
+          </Button>
+          <Link href="/flags">
+            <Button type="button" variant="secondary">
+              Cancel
+            </Button>
           </Link>
         </div>
       </form>

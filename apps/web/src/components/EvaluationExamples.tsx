@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui';
 
 interface EvaluationScenario {
   id: string;
@@ -449,13 +450,14 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
 
   if (!isOpen) {
     return (
-      <button
+      <Button
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+        variant="primary"
+        className="bg-purple-600 hover:bg-purple-700 flex items-center space-x-2"
       >
         <span>🧪</span>
         <span>Show Test Scenarios</span>
-      </button>
+      </Button>
     );
   }
 

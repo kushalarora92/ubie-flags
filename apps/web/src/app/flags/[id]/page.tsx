@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, Flag } from '@/lib/api';
+import { Button, Badge, Card, CardHeader, CardTitle, CardContent, Alert } from '@/components/ui';
 
 export default function FlagDetailsPage() {
   const params = useParams();
@@ -37,18 +38,9 @@ export default function FlagDetailsPage() {
     try {
       await api.deleteFlag(flag.id);
       router.push('/flags');
-    } catch (err) {
+    } catch {
       alert('Failed to delete flag');
     }
-  };
-
-  const getStateBadge = (state: string) => {
-    const colors = {
-      draft: 'bg-gray-100 text-gray-800',
-      live: 'bg-green-100 text-green-800',
-      deprecated: 'bg-red-100 text-red-800',
-    };
-    return colors[state as keyof typeof colors] || colors.draft;
   };
 
   const formatDate = (date: string | null) => {
@@ -63,9 +55,9 @@ export default function FlagDetailsPage() {
   if (error || !flag) {
     return (
       <div className="space-y-4">
-        <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
-          Error: {error || 'Flag not found'}
-        </div>
+        <Alert variant="error">
+          {error || 'Flag not found'}
+        </Alert>
         <Link href="/flags" className="text-blue-600 hover:text-blue-900">
           ← Back to Flags
         </Link>
@@ -85,18 +77,12 @@ export default function FlagDetailsPage() {
           <p className="text-gray-600 mt-1">Key: <code className="bg-gray-100 px-2 py-1 rounded text-sm">{flag.key}</code></p>
         </div>
         <div className="flex gap-2">
-          <Link
-            href={`/flags/${flag.id}/edit`}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Edit
+          <Link href={`/flags/${flag.id}/edit`}>
+            <Button variant="primary">Edit</Button>
           </Link>
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-          >
+          <Button variant="danger" onClick={handleDelete}>
             Delete
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -110,18 +96,18 @@ export default function FlagDetailsPage() {
             <div>
               <span className="text-sm font-medium text-gray-500">Environment</span>
               <p className="mt-1">
-                <span className="px-2 py-1 text-sm rounded bg-gray-100">
+                <Badge variant="environment" value={flag.environment}>
                   {flag.environment}
-                </span>
+                </Badge>
               </p>
             </div>
             
             <div>
               <span className="text-sm font-medium text-gray-500">State</span>
               <p className="mt-1">
-                <span className={`px-2 py-1 text-sm rounded ${getStateBadge(flag.state)}`}>
+                <Badge variant="state" value={flag.state}>
                   {flag.state}
-                </span>
+                </Badge>
               </p>
             </div>
 
@@ -196,23 +182,25 @@ export default function FlagDetailsPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
-        <div className="flex gap-3">
-          <Link
-            href={`/evaluate?flagKey=${flag.key}&environment=${flag.environment}`}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
-          >
-            🔍 Test Evaluation
-          </Link>
-          <Link
-            href={`/flags/${flag.id}/edit`}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
-          >
-            ✏️ Edit Flag
-          </Link>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Link href={`/evaluate?flagKey=${flag.key}&environment=${flag.environment}`}>
+              <Button variant="secondary" size="sm">
+                🔍 Test Evaluation
+              </Button>
+            </Link>
+            <Link href={`/flags/${flag.id}/edit`}>
+              <Button variant="secondary" size="sm">
+                ✏️ Edit Flag
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

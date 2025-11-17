@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api, Flag, FlagStats } from '@/lib/api';
 import Link from 'next/link';
+import { Button, Badge, Card } from '@/components/ui';
 
 export default function StaleFlagsPage() {
   const [staleFlags, setStaleFlags] = useState<Flag[]>([]);
@@ -39,15 +40,6 @@ export default function StaleFlagsPage() {
     return `${days} days ago`;
   }
 
-  function getStateBadge(state: string) {
-    const colors = {
-      draft: 'bg-gray-100 text-gray-800',
-      live: 'bg-green-100 text-green-800',
-      deprecated: 'bg-red-100 text-red-800',
-    };
-    return colors[state as keyof typeof colors] || colors.draft;
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -69,57 +61,45 @@ export default function StaleFlagsPage() {
       {/* Stats Summary */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <Card>
             <div className="text-sm text-gray-600">Total Flags</div>
             <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-          </div>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          </Card>
+          <Card className="bg-yellow-50 border-yellow-200">
             <div className="text-sm text-yellow-700">Stale (30 days)</div>
             <div className="text-2xl font-bold text-yellow-900">{stats.stale.thirtyDays}</div>
-          </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          </Card>
+          <Card className="bg-orange-50 border-orange-200">
             <div className="text-sm text-orange-700">Stale (60 days)</div>
             <div className="text-2xl font-bold text-orange-900">{stats.stale.sixtyDays}</div>
-          </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          </Card>
+          <Card className="bg-red-50 border-red-200">
             <div className="text-sm text-red-700">Stale (90 days)</div>
             <div className="text-2xl font-bold text-red-900">{stats.stale.ninetyDays}</div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Filter Buttons */}
       <div className="flex space-x-2">
-        <button
+        <Button
           onClick={() => setSelectedDays(30)}
-          className={`px-4 py-2 rounded-lg font-medium ${
-            selectedDays === 30
-              ? 'bg-blue-600 text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-          }`}
+          variant={selectedDays === 30 ? 'primary' : 'secondary'}
         >
           30 Days
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setSelectedDays(60)}
-          className={`px-4 py-2 rounded-lg font-medium ${
-            selectedDays === 60
-              ? 'bg-blue-600 text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-          }`}
+          variant={selectedDays === 60 ? 'primary' : 'secondary'}
         >
           60 Days
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setSelectedDays(90)}
-          className={`px-4 py-2 rounded-lg font-medium ${
-            selectedDays === 90
-              ? 'bg-blue-600 text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-          }`}
+          variant={selectedDays === 90 ? 'primary' : 'secondary'}
         >
           90 Days
-        </button>
+        </Button>
       </div>
 
       {/* Stale Flags Table */}
@@ -165,13 +145,9 @@ export default function StaleFlagsPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">{flag.environment}</td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStateBadge(
-                        flag.state
-                      )}`}
-                    >
+                    <Badge variant="state" value={flag.state}>
                       {flag.state}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {getDaysSinceEvaluation(flag.lastEvaluatedAt)}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Flag } from '@/lib/api';
+import { Button, Badge, Alert } from '@/components/ui';
 
 export default function FlagsPage() {
   const [flags, setFlags] = useState<Flag[]>([]);
@@ -32,18 +33,9 @@ export default function FlagsPage() {
     try {
       await api.deleteFlag(id);
       await loadFlags();
-    } catch (err) {
+    } catch {
       alert('Failed to delete flag');
     }
-  };
-
-  const getStateBadge = (state: string) => {
-    const colors = {
-      draft: 'bg-gray-100 text-gray-800',
-      live: 'bg-green-100 text-green-800',
-      deprecated: 'bg-red-100 text-red-800',
-    };
-    return colors[state as keyof typeof colors] || colors.draft;
   };
 
   const formatDate = (date: string | null) => {
@@ -99,9 +91,9 @@ export default function FlagsPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
-        Error: {error}
-      </div>
+      <Alert variant="error">
+        {error}
+      </Alert>
     );
   }
 
@@ -111,18 +103,17 @@ export default function FlagsPage() {
         <h1 className="text-3xl font-bold text-gray-900">Feature Flags</h1>
         <div className="flex space-x-2">
           {flags.length > 0 && (
-            <button
+            <Button
+              variant="danger"
               onClick={handleClearDemoData}
-              className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 border border-red-300"
             >
               🗑️ Clear All Data
-            </button>
+            </Button>
           )}
-          <Link
-            href="/flags/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            + Create Flag
+          <Link href="/flags/new">
+            <Button variant="primary">
+              + Create Flag
+            </Button>
           </Link>
         </div>
       </div>
@@ -135,17 +126,18 @@ export default function FlagsPage() {
           </div>
           
           <div className="flex justify-center space-x-4">
-            <button
+            <Button
+              variant="primary"
+              size="lg"
               onClick={handleSeedDemoData}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+              className="bg-purple-600 hover:bg-purple-700"
             >
               ✨ Seed Demo Data
-            </button>
-            <Link
-              href="/flags/new"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-            >
-              + Create Flag
+            </Button>
+            <Link href="/flags/new">
+              <Button variant="primary" size="lg">
+                + Create Flag
+              </Button>
             </Link>
           </div>
           
@@ -200,14 +192,14 @@ export default function FlagsPage() {
                     {flag.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    <span className="px-2 py-1 text-xs rounded bg-gray-100">
+                    <Badge variant="environment" value={flag.environment}>
                       {flag.environment}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 py-1 text-xs rounded ${getStateBadge(flag.state)}`}>
+                    <Badge variant="state" value={flag.state}>
                       {flag.state}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     <div className="flex items-center space-x-2">
