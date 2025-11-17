@@ -42,9 +42,7 @@ services:
       - api
     environment:
       NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://api:3000
-      # helps file watching inside Docker on some systems
-      CHOKIDAR_USEPOLLING: "true"
+      NEXT_PUBLIC_API_URL: http://localhost:3001
     volumes:
       - ./apps/web:/usr/src/app
       - /usr/src/app/node_modules

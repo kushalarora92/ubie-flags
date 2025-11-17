@@ -1,0 +1,90 @@
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+export interface Flag {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  environment: 'dev' | 'staging' | 'prod';
+  state: 'draft' | 'live' | 'deprecated';
+  defaultValue: boolean;
+  rules?: any;
+  createdAt: string;
+  updatedAt: string;
+  lastEvaluatedAt: string | null;
+}
+
+export interface EvaluationResult {
+  result: boolean;
+  explanation: {
+    flagKey: string;
+    environment: string;
+    result: boolean;
+    defaultValue: boolean;
+    matchedRule?: string;
+    details: string[];
+  };
+}
+
+export const api = {
+  // Flags
+  async getFlags(): Promise<Flag[]> {
+    const res = await fetch(`${API_BASE_URL}/flags`);
+    if (!res.ok) throw new Error('Failed to fetch flags');
+    return res.json();
+  },
+
+  async getFlag(id: string): Promise<Flag> {
+    const res = await fetch(`${API_BASE_URL}/flags/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch flag');
+    return res.json();
+  },
+
+  async createFlag(data: Partial<Flag>): Promise<Flag> {
+    const res = await fetch(`${API_BASE_URL}/flags`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to create flag');
+    }
+    return res.json();
+  },
+
+  async updateFlag(id: string, data: Partial<Flag>): Promise<Flag> {
+    const res = await fetch(`${API_BASE_URL}/flags/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update flag');
+    return res.json();
+  },
+
+  async deleteFlag(id: string): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/flags/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete flag');
+  },
+
+  // Evaluation
+  async evaluateFlag(
+    flagKey: string,
+    environment: string,
+    context: any
+  ): Promise<EvaluationResult> {
+    const res = await fetch(`${API_BASE_URL}/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ flagKey, environment, context }),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to evaluate flag');
+    }
+    return res.json();
+  },
+};
