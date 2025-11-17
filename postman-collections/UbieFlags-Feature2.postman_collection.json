@@ -1,0 +1,567 @@
+{
+  "info": {
+    "name": "UbieFlags - Feature 2: Explainable Evaluation",
+    "description": "Test the core differentiator: flag evaluation with detailed explanations showing WHY a flag resolved to true/false",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "flagId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup - Create Flags",
+      "item": [
+        {
+          "name": "Create Flag - Simple Country Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('countryFlagId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"test_country\",\n  \"name\": \"Test Country Feature\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"conditions\": [\n      {\n        \"field\": \"country\",\n        \"operator\": \"EQUALS\",\n        \"value\": \"CA\"\n      }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - Beta Access (AND operator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('betaFlagId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"beta_access\",\n  \"name\": \"Beta Access\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"operator\": \"AND\",\n    \"conditions\": [\n      {\n        \"field\": \"country\",\n        \"operator\": \"IN\",\n        \"value\": [\"CA\", \"US\", \"UK\"]\n      },\n      {\n        \"field\": \"role\",\n        \"operator\": \"EQUALS\",\n        \"value\": \"beta_tester\"\n      }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - Special Access (OR operator)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"special_access\",\n  \"name\": \"Special Access\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"operator\": \"OR\",\n    \"conditions\": [\n      {\n        \"field\": \"role\",\n        \"operator\": \"EQUALS\",\n        \"value\": \"admin\"\n      },\n      {\n        \"field\": \"email\",\n        \"operator\": \"ENDS_WITH\",\n        \"value\": \"@company.com\"\n      }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - Gradual Rollout (50%)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"gradual_rollout\",\n  \"name\": \"Gradual Rollout\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"rollout\": {\n      \"percentage\": 50,\n      \"seed\": \"experiment-v1\"\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - Targeted Rollout (Conditions + Rollout)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"targeted_rollout\",\n  \"name\": \"Targeted Rollout\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"operator\": \"AND\",\n    \"conditions\": [\n      {\n        \"field\": \"country\",\n        \"operator\": \"EQUALS\",\n        \"value\": \"CA\"\n      }\n    ],\n    \"rollout\": {\n      \"percentage\": 50\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - Age Restricted (Numeric)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"age_restricted\",\n  \"name\": \"Age Restricted Feature\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"conditions\": [\n      {\n        \"field\": \"age\",\n        \"operator\": \"GTE\",\n        \"value\": 18\n      }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - Internal Features (String)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"internal_features\",\n  \"name\": \"Internal Features\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"conditions\": [\n      {\n        \"field\": \"email\",\n        \"operator\": \"ENDS_WITH\",\n        \"value\": \"@company.com\"\n      }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag - No Rules (Default Value)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"simple_flag\",\n  \"name\": \"Simple Flag\",\n  \"environment\": \"dev\",\n  \"defaultValue\": true,\n  \"state\": \"live\"\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 1 - Simple EQUALS Condition",
+      "item": [
+        {
+          "name": "Evaluate - User in Canada (TRUE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"test_country\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"country\": \"CA\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - User in US (FALSE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"test_country\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user456\",\n    \"country\": \"US\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 2 - AND Operator (Multiple Conditions)",
+      "item": [
+        {
+          "name": "Evaluate - Both Conditions Match (TRUE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"beta_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"country\": \"CA\",\n    \"role\": \"beta_tester\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Only One Condition Matches (FALSE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"beta_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user456\",\n    \"country\": \"CA\",\n    \"role\": \"regular_user\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - No Conditions Match (FALSE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"beta_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user789\",\n    \"country\": \"JP\",\n    \"role\": \"regular_user\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 3 - OR Operator",
+      "item": [
+        {
+          "name": "Evaluate - First Condition Matches (TRUE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"special_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"role\": \"admin\",\n    \"email\": \"user@external.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Second Condition Matches (TRUE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"special_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user456\",\n    \"role\": \"user\",\n    \"email\": \"john@company.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Both Conditions Match (TRUE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"special_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user789\",\n    \"role\": \"admin\",\n    \"email\": \"admin@company.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - No Conditions Match (FALSE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"special_access\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user999\",\n    \"role\": \"user\",\n    \"email\": \"user@external.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 4 - Rollout Percentage",
+      "item": [
+        {
+          "name": "Evaluate - User 1",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"gradual_rollout\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user1\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - User 2",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"gradual_rollout\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user2\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - User 3",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"gradual_rollout\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user3\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Same User (Consistency Check)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"gradual_rollout\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user1\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 5 - Conditions + Rollout Combined",
+      "item": [
+        {
+          "name": "Evaluate - Wrong Country (FALSE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"targeted_rollout\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"country\": \"US\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Right Country, Check Rollout",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"targeted_rollout\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user_in_rollout\",\n    \"country\": \"CA\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 6 - No Rules (Default Value)",
+      "item": [
+        {
+          "name": "Evaluate - Should Return Default TRUE",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"simple_flag\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 7 - Numeric Comparisons",
+      "item": [
+        {
+          "name": "Evaluate - Age 25 (TRUE, >= 18)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"age_restricted\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"age\": 25\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Age 18 (TRUE, exactly 18)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"age_restricted\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user456\",\n    \"age\": 18\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Age 16 (FALSE, < 18)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"age_restricted\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user789\",\n    \"age\": 16\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 8 - String Operations",
+      "item": [
+        {
+          "name": "Evaluate - Internal Email (TRUE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"internal_features\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"email\": \"john@company.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - External Email (FALSE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"internal_features\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user456\",\n    \"email\": \"user@external.com\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 9 - Error Cases",
+      "item": [
+        {
+          "name": "Evaluate - Flag Not Found (404)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"non_existent_flag\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Invalid Environment (400)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"test_country\",\n  \"environment\": \"invalid_env\",\n  \"context\": {\n    \"userId\": \"user123\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate - Missing Required Fields (400)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"test_country\"\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 10 - Verify lastEvaluatedAt",
+      "item": [
+        {
+          "name": "1. Get Flag Before Evaluation",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/flags/{{countryFlagId}}"
+          }
+        },
+        {
+          "name": "2. Evaluate Flag",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"test_country\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"timestamp_test_user\",\n    \"country\": \"CA\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "3. Get Flag After Evaluation",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/flags/{{countryFlagId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "All Operators Demo",
+      "item": [
+        {
+          "name": "Create Flag - All Operators",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"operator_showcase\",\n  \"name\": \"Operator Showcase\",\n  \"environment\": \"dev\",\n  \"defaultValue\": false,\n  \"state\": \"live\",\n  \"rules\": {\n    \"operator\": \"OR\",\n    \"conditions\": [\n      {\n        \"field\": \"status\",\n        \"operator\": \"EQUALS\",\n        \"value\": \"premium\"\n      },\n      {\n        \"field\": \"country\",\n        \"operator\": \"IN\",\n        \"value\": [\"CA\", \"US\", \"UK\"]\n      },\n      {\n        \"field\": \"score\",\n        \"operator\": \"GT\",\n        \"value\": 100\n      },\n      {\n        \"field\": \"age\",\n        \"operator\": \"GTE\",\n        \"value\": 18\n      },\n      {\n        \"field\": \"credits\",\n        \"operator\": \"LT\",\n        \"value\": 10\n      },\n      {\n        \"field\": \"level\",\n        \"operator\": \"LTE\",\n        \"value\": 5\n      },\n      {\n        \"field\": \"tags\",\n        \"operator\": \"CONTAINS\",\n        \"value\": \"vip\"\n      },\n      {\n        \"field\": \"username\",\n        \"operator\": \"STARTS_WITH\",\n        \"value\": \"admin_\"\n      },\n      {\n        \"field\": \"email\",\n        \"operator\": \"ENDS_WITH\",\n        \"value\": \"@company.com\"\n      },\n      {\n        \"field\": \"nickname\",\n        \"operator\": \"NOT_EQUALS\",\n        \"value\": \"guest\"\n      },\n      {\n        \"field\": \"excludedCountries\",\n        \"operator\": \"NOT_IN\",\n        \"value\": [\"XX\", \"YY\"]\n      }\n    ]\n  }\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Test - Premium User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"operator_showcase\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user123\",\n    \"status\": \"premium\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Test - High Score User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"operator_showcase\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user456\",\n    \"score\": 150,\n    \"status\": \"regular\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Test - Admin User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"operator_showcase\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"user789\",\n    \"username\": \"admin_john\",\n    \"status\": \"regular\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    }
+  ]
+}

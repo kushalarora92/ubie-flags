@@ -191,6 +191,25 @@ Example response:
 }
 ```
 
+### 📬 Postman Collection
+
+A full feature-wise Postman collections are included under:
+
+```
+/postman-collections/
+```
+
+It provides ready-made requests for:
+
+* Creating feature flags
+* Listing flags
+* Fetching a single flag
+* Evaluating flags (`/evaluate`)
+* Testing rule-matching scenarios
+* Inspecting explanation objects
+
+Import the JSON file into Postman to get started immediately.
+
 ---
 
 # 🛠 Tech Stack

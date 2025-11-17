@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FlagsModule } from './flags/flags.module';
+import { EvaluationModule } from './evaluation/evaluation.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FlagsModule } from './flags/flags.module';
       logging: true,
     }),
     FlagsModule,
+    EvaluationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
