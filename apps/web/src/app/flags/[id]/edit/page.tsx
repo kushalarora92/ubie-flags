@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { api, Flag } from '@/lib/api';
+import Link from 'next/link';
+import { api } from '@/lib/api';
 
 export default function EditFlagPage() {
   const params = useParams();
@@ -88,9 +89,9 @@ export default function EditFlagPage() {
         <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
           Error: {error}
         </div>
-        <a href="/flags" className="text-blue-600 hover:text-blue-900">
+        <Link href="/flags" className="text-blue-600 hover:text-blue-900">
           ← Back to Flags
-        </a>
+        </Link>
       </div>
     );
   }
@@ -98,12 +99,12 @@ export default function EditFlagPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <a
+        <Link
           href={`/flags/${params.id}`}
           className="text-sm text-blue-600 hover:text-blue-900 mb-2 inline-block"
         >
           ← Back to Flag Details
-        </a>
+        </Link>
         <h1 className="text-3xl font-bold text-gray-900">Edit Flag</h1>
       </div>
 
@@ -197,12 +198,12 @@ export default function EditFlagPage() {
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
-          <a
+          <Link
             href={`/flags/${params.id}`}
             className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </div>

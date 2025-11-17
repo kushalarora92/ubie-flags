@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="space-y-8">
@@ -9,7 +11,7 @@ export default function Home() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <a
+        <Link
           href="/flags"
           className="block p-6 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
         >
@@ -17,9 +19,9 @@ export default function Home() {
           <p className="mt-2 text-gray-600">
             Create, view, and manage feature flags across environments
           </p>
-        </a>
+        </Link>
 
-        <a
+        <Link
           href="/evaluate"
           className="block p-6 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
         >
@@ -27,17 +29,17 @@ export default function Home() {
           <p className="mt-2 text-gray-600">
             Evaluate flags with user context and see detailed explanations
           </p>
-        </a>
+        </Link>
 
-        <a
+        <Link
           href="/stale"
           className="block p-6 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
         >
           <h2 className="text-xl font-semibold text-gray-900">⚠️ Stale Flags</h2>
           <p className="mt-2 text-gray-600">
-            View flags that haven't been evaluated recently
+            View flags that haven&apos;t been evaluated recently
           </p>
-        </a>
+        </Link>
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">

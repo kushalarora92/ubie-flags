@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api, Flag } from '@/lib/api';
 
 export default function FlagsPage() {
@@ -117,12 +118,12 @@ export default function FlagsPage() {
               🗑️ Clear All Data
             </button>
           )}
-          <a
+          <Link
             href="/flags/new"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             + Create Flag
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -140,12 +141,12 @@ export default function FlagsPage() {
             >
               ✨ Seed Demo Data
             </button>
-            <a
+            <Link
               href="/flags/new"
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
               + Create Flag
-            </a>
+            </Link>
           </div>
           
           <div className="mt-6 text-left max-w-2xl mx-auto bg-purple-50 border border-purple-200 rounded-lg p-4">
@@ -226,18 +227,18 @@ export default function FlagsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    <a
+                    <Link
                       href={`/flags/${flag.id}`}
                       className="text-blue-600 hover:text-blue-900"
                     >
                       View
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                       href={`/flags/${flag.id}/edit`}
                       className="text-green-600 hover:text-green-900"
                     >
                       Edit
-                    </a>
+                    </Link>
                     <button
                       onClick={() => handleDelete(flag.id, flag.key)}
                       className="text-red-600 hover:text-red-900"

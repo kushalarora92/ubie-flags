@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import FlagExamples from '@/components/FlagExamples';
+import Link from 'next/link';
 
 export default function NewFlagPage() {
   const router = useRouter();
@@ -200,12 +201,12 @@ export default function NewFlagPage() {
           >
             {loading ? 'Creating...' : 'Create Flag'}
           </button>
-          <a
+          <Link
             href="/flags"
             className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </div>

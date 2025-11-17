@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,34 +32,34 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex">
-                <a href="/" className="flex items-center px-2 text-xl font-bold text-gray-900">
+                <Link href="/" className="flex items-center px-2 text-xl font-bold text-gray-900">
                   🚩 UbieFlags
-                </a>
+                </Link>
                 <div className="ml-6 flex space-x-4 items-center">
-                  <a
+                  <Link
                     href="/flags"
                     className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                   >
                     Flags
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/evaluate"
                     className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                   >
                     Test Evaluation
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/stale"
                     className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                   >
                     Stale Flags
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/demo"
                     className="px-3 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
                   >
                     🎬 Demo
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api, Flag } from '@/lib/api';
 
 export default function FlagDetailsPage() {
@@ -65,9 +66,9 @@ export default function FlagDetailsPage() {
         <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
           Error: {error || 'Flag not found'}
         </div>
-        <a href="/flags" className="text-blue-600 hover:text-blue-900">
+        <Link href="/flags" className="text-blue-600 hover:text-blue-900">
           ← Back to Flags
-        </a>
+        </Link>
       </div>
     );
   }
@@ -77,19 +78,19 @@ export default function FlagDetailsPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <a href="/flags" className="text-sm text-blue-600 hover:text-blue-900 mb-2 inline-block">
+          <Link href="/flags" className="text-sm text-blue-600 hover:text-blue-900 mb-2 inline-block">
             ← Back to Flags
-          </a>
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900">{flag.name}</h1>
           <p className="text-gray-600 mt-1">Key: <code className="bg-gray-100 px-2 py-1 rounded text-sm">{flag.key}</code></p>
         </div>
         <div className="flex gap-2">
-          <a
+          <Link
             href={`/flags/${flag.id}/edit`}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Edit
-          </a>
+          </Link>
           <button
             onClick={handleDelete}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
@@ -198,18 +199,18 @@ export default function FlagDetailsPage() {
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
         <div className="flex gap-3">
-          <a
+          <Link
             href={`/evaluate?flagKey=${flag.key}&environment=${flag.environment}`}
             className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
           >
             🔍 Test Evaluation
-          </a>
-          <a
+          </Link>
+          <Link
             href={`/flags/${flag.id}/edit`}
             className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
           >
             ✏️ Edit Flag
-          </a>
+          </Link>
         </div>
       </div>
     </div>
