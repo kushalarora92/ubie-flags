@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ubieflags-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ubie
+      POSTGRES_PASSWORD: ubie
+      POSTGRES_DB: ubieflags
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data-dev:/var/lib/postgresql/data
+
+  api:
+    image: node:20-alpine
+    container_name: ubieflags-api-dev
+    working_dir: /usr/src/app
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ubie
+      DB_PASSWORD: ubie
+      DB_NAME: ubieflags
+      NODE_ENV: development
+    volumes:
+      - ./apps/api:/usr/src/app
+    command: sh -c "npm install && npm run start:dev"
+    ports:
+      - "3001:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    image: node:20-alpine
+    container_name: ubieflags-web-dev
+    working_dir: /usr/src/app
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://api:3000
+      # helps file watching inside Docker on some systems
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./apps/web:/usr/src/app
+      - /usr/src/app/node_modules
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+
+volumes:
+  db-data-dev:
