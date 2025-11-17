@@ -45,11 +45,11 @@ export class FlagsService {
 
   async findOne(id: string): Promise<FeatureFlag> {
     const flag = await this.flagRepository.findOne({ where: { id } });
-    
+
     if (!flag) {
       throw new NotFoundException(`Flag with ID ${id} not found`);
     }
-    
+
     return flag;
   }
 

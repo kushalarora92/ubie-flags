@@ -11,7 +11,10 @@ import {
   IsDefined,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { RuleOperator, ConditionOperator } from '../../entities/types/rule.types';
+import {
+  RuleOperator,
+  ConditionOperator,
+} from '../../entities/types/rule.types';
 
 export class RuleConditionDto {
   @IsString()

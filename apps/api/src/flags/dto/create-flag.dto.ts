@@ -1,4 +1,10 @@
-import { IsString, IsBoolean, IsEnum, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { FlagState, Environment } from '../../entities/feature-flag.entity';
 import { FlagRulesDto } from './flag-rules.dto';

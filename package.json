@@ -2,14 +2,24 @@
   "name": "ubie-flags",
   "private": true,
   "version": "1.0.0",
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev:web": "cd apps/web && npm run dev",
-    "dev:api": "cd apps/api && npm run start:dev"
+    "dev:api": "cd apps/api && npm run start:dev",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6"
+  }
 }

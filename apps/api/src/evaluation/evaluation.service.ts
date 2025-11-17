@@ -3,8 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
 import { FeatureFlag, Environment } from '../entities/feature-flag.entity';
-import { EvaluationContext, EvaluationResult } from '../entities/types/evaluation.types';
-import { RuleOperator, ConditionOperator, RuleCondition } from '../entities/types/rule.types';
+import {
+  EvaluationContext,
+  EvaluationResult,
+} from '../entities/types/evaluation.types';
+import {
+  RuleOperator,
+  ConditionOperator,
+  RuleCondition,
+} from '../entities/types/rule.types';
 
 @Injectable()
 export class EvaluationService {
@@ -112,14 +119,13 @@ export class EvaluationService {
     context: EvaluationContext,
     details: string[],
   ): boolean {
-    details.push(`Checking ${conditions.length} condition(s) with ${operator} operator:`);
+    details.push(
+      `Checking ${conditions.length} condition(s) with ${operator} operator:`,
+    );
 
     const results = conditions.map((condition, index) => {
       const contextValue = context[condition.field];
-      const result = this.evaluateSingleCondition(
-        condition,
-        contextValue,
-      );
+      const result = this.evaluateSingleCondition(condition, contextValue);
 
       const statusIcon = result ? '✓' : '✗';
       details.push(
@@ -181,7 +187,9 @@ export class EvaluationService {
         return false;
 
       case ConditionOperator.STARTS_WITH:
-        return typeof contextValue === 'string' && contextValue.startsWith(value);
+        return (
+          typeof contextValue === 'string' && contextValue.startsWith(value)
+        );
 
       case ConditionOperator.ENDS_WITH:
         return typeof contextValue === 'string' && contextValue.endsWith(value);
@@ -214,15 +222,15 @@ export class EvaluationService {
     }
 
     // Use consistent hashing to determine rollout
-    const hash = createHash('md5')
-      .update(`${userId}:${seed}`)
-      .digest('hex');
+    const hash = createHash('md5').update(`${userId}:${seed}`).digest('hex');
 
     // Convert first 8 characters of hash to number and get percentage
     const hashValue = parseInt(hash.substring(0, 8), 16);
     const userPercentage = (hashValue % 100) + 1;
 
-    details.push(`  Rollout check: user ${userId} → ${userPercentage}% (threshold: ${percentage}%)`);
+    details.push(
+      `  Rollout check: user ${userId} → ${userPercentage}% (threshold: ${percentage}%)`,
+    );
 
     return userPercentage <= percentage;
   }
