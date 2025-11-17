@@ -32,15 +32,14 @@ export const FLAG_ENVIRONMENT_OPTIONS = [
 
 // Form data types
 export interface FlagFormData {
-  key?: string;
   name: string;
-  description: string;
-  environment?: FlagEnvironment;
+  description?: string;
   state: FlagState;
   defaultValue: boolean;
-  rules: string; // JSON string
+  rules?: string | object; // Optional, supports both JSON string and object representation
 }
 
+// For creating a new flag (includes key and environment)
 export interface CreateFlagFormData extends FlagFormData {
   key: string;
   environment: FlagEnvironment;

@@ -1,21 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { CreateFlagFormData } from '@/constants/flag';
 
 interface FlagTemplate {
   id: string;
   name: string;
   description: string;
   category: string;
-  data: {
-    key: string;
-    name: string;
-    description?: string;
-    environment: 'dev' | 'staging' | 'prod';
-    state: 'draft' | 'live' | 'deprecated';
-    defaultValue: boolean;
-    rules?: any;
-  };
+  data: CreateFlagFormData;
 }
 
 interface FlagExamplesProps {

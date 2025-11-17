@@ -1,3 +1,5 @@
+import { FlagEnvironment, FlagState } from '@/constants/flag';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export interface Flag {
@@ -5,10 +7,10 @@ export interface Flag {
   key: string;
   name: string;
   description?: string;
-  environment: 'dev' | 'staging' | 'prod';
-  state: 'draft' | 'live' | 'deprecated';
+  environment: FlagEnvironment;
+  state: FlagState;
   defaultValue: boolean;
-  rules?: any;
+  rules?: string | object;
   createdAt: string;
   updatedAt: string;
   lastEvaluatedAt: string | null;
@@ -83,7 +85,7 @@ export const api = {
   async evaluateFlag(
     flagKey: string,
     environment: string,
-    context: any
+    context: Record<string, unknown>
   ): Promise<EvaluationResult> {
     const res = await fetch(`${API_BASE_URL}/evaluate`, {
       method: 'POST',
@@ -111,7 +113,7 @@ export const api = {
   },
 
   // Demo Data
-  async seedDemoData(flags: any[]): Promise<{ message: string; created: number; flags: Array<{ key: string; name: string; environment: string }> }> {
+  async seedDemoData(flags: Partial<Flag>[]): Promise<{ message: string; created: number; flags: Array<{ key: string; name: string; environment: string }> }> {
     const res = await fetch(`${API_BASE_URL}/flags/seed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

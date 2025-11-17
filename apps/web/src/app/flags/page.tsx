@@ -150,7 +150,7 @@ export default function FlagsPage() {
           </div>
           
           <div className="mt-6 text-left max-w-2xl mx-auto bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <h3 className="font-semibold text-purple-900 mb-2">💡 What does "Seed Demo Data" do?</h3>
+            <h3 className="font-semibold text-purple-900 mb-2">💡 What does &quot;Seed Demo Data&quot; do?</h3>
             <p className="text-sm text-purple-800 mb-2">Creates 11 sample flags showcasing:</p>
             <ul className="text-sm text-purple-800 space-y-1 list-disc list-inside">
               <li>Simple conditions (country, email, age)</li>
