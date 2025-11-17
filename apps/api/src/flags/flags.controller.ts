@@ -17,6 +17,7 @@ import {
 import { FlagsService } from './flags.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
 import { UpdateFlagDto } from './dto/update-flag.dto';
+import { SeedFlagsDto } from './dto/seed-flags.dto';
 
 @Controller('flags')
 export class FlagsController {
@@ -38,6 +39,17 @@ export class FlagsController {
   @Get('stats')
   getStats() {
     return this.flagsService.getStats();
+  }
+
+  @Post('seed')
+  async seedDemoData(@Body() seedDto: SeedFlagsDto) {
+    return this.flagsService.seedDemoData(seedDto.flags);
+  }
+
+  @Delete('seed')
+  @HttpCode(HttpStatus.OK)
+  clearDemoData() {
+    return this.flagsService.clearDemoData();
   }
 
   @Get()

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeatureFlag } from '../entities/feature-flag.entity';
@@ -111,6 +115,61 @@ export class FlagsService {
         sixtyDays: stale60,
         ninetyDays: stale90,
       },
+    };
+  }
+
+  /**
+   * Seed demo data for testing and demos
+   */
+  async seedDemoData(demoFlags: any[]) {
+    const created = [];
+
+    for (const flagData of demoFlags) {
+      try {
+        // Check if flag already exists
+        const existing = await this.flagRepository.findOne({
+          where: {
+            key: flagData.key,
+            environment: flagData.environment as any,
+          },
+        });
+
+        if (!existing) {
+          const flag = this.flagRepository.create(flagData as any);
+          await this.flagRepository.save(flag);
+          created.push({
+            key: flagData.key,
+            name: flagData.name,
+            environment: flagData.environment,
+          });
+        }
+      } catch (error) {
+        // Skip if error (likely duplicate)
+        console.error(`Failed to create flag ${flagData.key}:`, error);
+      }
+    }
+
+    return {
+      message: 'Demo data seeded successfully',
+      created: created.length,
+      flags: created,
+    };
+  }
+
+  /**
+   * Clear all flags (for demo reset)
+   */
+  async clearDemoData() {
+    const allFlags = await this.flagRepository.find();
+    const deleted = allFlags.length;
+
+    if (deleted > 0) {
+      await this.flagRepository.remove(allFlags);
+    }
+
+    return {
+      message: 'All flags cleared successfully',
+      deleted,
     };
   }
 }

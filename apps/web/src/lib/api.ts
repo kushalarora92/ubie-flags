@@ -109,4 +109,23 @@ export const api = {
     if (!res.ok) throw new Error('Failed to fetch stats');
     return res.json();
   },
+
+  // Demo Data
+  async seedDemoData(flags: any[]): Promise<{ message: string; created: number; flags: Array<{ key: string; name: string; environment: string }> }> {
+    const res = await fetch(`${API_BASE_URL}/flags/seed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ flags }),
+    });
+    if (!res.ok) throw new Error('Failed to seed demo data');
+    return res.json();
+  },
+
+  async clearDemoData(): Promise<{ message: string; deleted: number }> {
+    const res = await fetch(`${API_BASE_URL}/flags/seed`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to clear demo data');
+    return res.json();
+  },
 };

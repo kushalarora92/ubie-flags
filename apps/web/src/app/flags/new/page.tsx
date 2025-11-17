@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import FlagExamples from '@/components/FlagExamples';
 
 export default function NewFlagPage() {
   const router = useRouter();
@@ -18,6 +19,18 @@ export default function NewFlagPage() {
     defaultValue: false,
     rules: '',
   });
+
+  const handleUseTemplate = (templateData: any) => {
+    setFormData({
+      key: templateData.key,
+      name: templateData.name,
+      description: templateData.description || '',
+      environment: templateData.environment,
+      state: templateData.state,
+      defaultValue: templateData.defaultValue,
+      rules: templateData.rules ? JSON.stringify(templateData.rules, null, 2) : '',
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +68,10 @@ export default function NewFlagPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Create New Flag</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Create New Flag</h1>
+        <FlagExamples onUseTemplate={handleUseTemplate} />
+      </div>
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded p-4 text-red-800">

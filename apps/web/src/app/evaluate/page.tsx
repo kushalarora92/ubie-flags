@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api, EvaluationResult } from '@/lib/api';
+import EvaluationExamples from '@/components/EvaluationExamples';
 
 export default function EvaluatePage() {
   const searchParams = useSearchParams();
@@ -59,13 +60,26 @@ export default function EvaluatePage() {
     }
   };
 
+  const handleUseScenario = (flagKey: string, environment: string, context: Record<string, unknown>) => {
+    setFormData({
+      flagKey,
+      environment,
+      context: JSON.stringify(context, null, 2),
+    });
+    setResult(null);
+    setError(null);
+  };
+
   return (
     <div className="max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Test Flag Evaluation</h1>
-        <p className="mt-2 text-gray-600">
-          Evaluate a flag with user context and see detailed explanations
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Test Flag Evaluation</h1>
+          <p className="mt-2 text-gray-600">
+            Evaluate a flag with user context and see detailed explanations
+          </p>
+        </div>
+        <EvaluationExamples onUseScenario={handleUseScenario} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

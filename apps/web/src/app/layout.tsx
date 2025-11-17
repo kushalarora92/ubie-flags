@@ -53,6 +53,12 @@ export default function RootLayout({
                   >
                     Stale Flags
                   </a>
+                  <a
+                    href="/demo"
+                    className="px-3 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                  >
+                    🎬 Demo
+                  </a>
                 </div>
               </div>
             </div>
