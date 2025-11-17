@@ -76,5 +76,41 @@ export class FlagsService {
     const flag = await this.findOne(id);
     await this.flagRepository.remove(flag);
   }
-}
 
+  /**
+   * Find stale flags (not evaluated in X days)
+   */
+  async findStaleFlags(days: number): Promise<FeatureFlag[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    return await this.flagRepository
+      .createQueryBuilder('flag')
+      .where(
+        '(flag.lastEvaluatedAt IS NULL OR flag.lastEvaluatedAt < :cutoffDate)',
+        { cutoffDate },
+      )
+      .orderBy('flag.lastEvaluatedAt', 'ASC', 'NULLS FIRST')
+      .getMany();
+  }
+
+  /**
+   * Get lifecycle statistics
+   */
+  async getStats() {
+    const total = await this.flagRepository.count();
+
+    const stale30 = (await this.findStaleFlags(30)).length;
+    const stale60 = (await this.findStaleFlags(60)).length;
+    const stale90 = (await this.findStaleFlags(90)).length;
+
+    return {
+      total,
+      stale: {
+        thirtyDays: stale30,
+        sixtyDays: stale60,
+        ninetyDays: stale90,
+      },
+    };
+  }
+}

@@ -26,6 +26,15 @@ export interface EvaluationResult {
   };
 }
 
+export interface FlagStats {
+  total: number;
+  stale: {
+    thirtyDays: number;
+    sixtyDays: number;
+    ninetyDays: number;
+  };
+}
+
 export const api = {
   // Flags
   async getFlags(): Promise<Flag[]> {
@@ -85,6 +94,19 @@ export const api = {
       const error = await res.json();
       throw new Error(error.message || 'Failed to evaluate flag');
     }
+    return res.json();
+  },
+
+  // Lifecycle
+  async getStaleFlags(days: number = 30): Promise<Flag[]> {
+    const res = await fetch(`${API_BASE_URL}/flags/stale?days=${days}`);
+    if (!res.ok) throw new Error('Failed to fetch stale flags');
+    return res.json();
+  },
+
+  async getStats(): Promise<FlagStats> {
+    const res = await fetch(`${API_BASE_URL}/flags/stats`);
+    if (!res.ok) throw new Error('Failed to fetch stats');
     return res.json();
   },
 };

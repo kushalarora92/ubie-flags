@@ -1,0 +1,743 @@
+{
+  "info": {
+    "name": "UbieFlags - Feature 3: Lifecycle & Stale Flags",
+    "description": "Test the lifecycle management and stale flag detection - helping teams identify flags safe to deprecate",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "recentFlagId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "oldFlagId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup - Create Test Flags",
+      "item": [
+        {
+          "name": "Create Flag 1 - Active Flag (will evaluate)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('activeFlagId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"active_feature\",\n  \"name\": \"Active Feature\",\n  \"description\": \"This flag will be evaluated regularly\",\n  \"environment\": \"prod\",\n  \"state\": \"live\",\n  \"defaultValue\": true\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag 2 - Stale Flag (won't evaluate)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('staleFlagId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"old_experiment\",\n  \"name\": \"Old Experiment\",\n  \"description\": \"This flag hasn't been used in a while\",\n  \"environment\": \"prod\",\n  \"state\": \"live\",\n  \"defaultValue\": false\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag 3 - Deprecated Flag",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"legacy_feature\",\n  \"name\": \"Legacy Feature\",\n  \"description\": \"Already marked as deprecated\",\n  \"environment\": \"prod\",\n  \"state\": \"deprecated\",\n  \"defaultValue\": false\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag 4 - Draft Flag",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"upcoming_feature\",\n  \"name\": \"Upcoming Feature\",\n  \"description\": \"Not yet live\",\n  \"environment\": \"dev\",\n  \"state\": \"draft\",\n  \"defaultValue\": false\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Create Flag 5 - Another Active Flag",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"new_ui\",\n  \"name\": \"New UI\",\n  \"description\": \"Recently deployed feature\",\n  \"environment\": \"staging\",\n  \"state\": \"live\",\n  \"defaultValue\": true\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 1 - Generate Recent Activity",
+      "item": [
+        {
+          "name": "Evaluate Active Flag - User 1",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"active_feature\",\n  \"environment\": \"prod\",\n  \"context\": {\n    \"userId\": \"user123\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate Active Flag - User 2",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"active_feature\",\n  \"environment\": \"prod\",\n  \"context\": {\n    \"userId\": \"user456\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Evaluate New UI Flag",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"new_ui\",\n  \"environment\": \"staging\",\n  \"context\": {\n    \"userId\": \"user789\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario 2 - Check Lifecycle Statistics",
+      "item": [
+        {
+          "name": "Get Overall Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/stats"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 3 - Query Stale Flags",
+      "item": [
+        {
+          "name": "Get Stale Flags - 30 Days (Default)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/stale"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - 30 Days (Explicit)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - 60 Days",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=60",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "60"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - 90 Days",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=90",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "90"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - 7 Days (Custom)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 4 - Verify lastEvaluatedAt Updates",
+      "item": [
+        {
+          "name": "1. Check Flag Before Evaluation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{staleFlagId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Evaluate the Stale Flag",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"old_experiment\",\n  \"environment\": \"prod\",\n  \"context\": {\n    \"userId\": \"test_user\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "3. Check Flag After Evaluation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{staleFlagId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Verify Flag is No Longer in 7-Day Stale List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 5 - Deprecation Workflow",
+      "item": [
+        {
+          "name": "1. List All Flags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Check Stale Flags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Mark Stale Flag as Deprecated",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"deprecated\"\n}"
+            },
+            "url": "{{baseUrl}}/flags/{{staleFlagId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Verify Flag State Changed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{staleFlagId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Check Updated Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/stats"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 6 - Never Evaluated Flags",
+      "item": [
+        {
+          "name": "Create Flag That Won't Be Evaluated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('neverEvaluatedId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"never_used\",\n  \"name\": \"Never Used Feature\",\n  \"description\": \"This flag will never be evaluated\",\n  \"environment\": \"prod\",\n  \"state\": \"live\",\n  \"defaultValue\": false\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "Verify Flag in Stale List Immediately",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Flag Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{neverEvaluatedId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 7 - Multi-Environment Stale Detection",
+      "item": [
+        {
+          "name": "Create Same Flag in Different Environments",
+          "item": [
+            {
+              "name": "Create in Dev",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key\": \"multi_env_feature\",\n  \"name\": \"Multi-Env Feature\",\n  \"environment\": \"dev\",\n  \"state\": \"live\",\n  \"defaultValue\": true\n}"
+                },
+                "url": "{{baseUrl}}/flags"
+              }
+            },
+            {
+              "name": "Create in Staging",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key\": \"multi_env_feature\",\n  \"name\": \"Multi-Env Feature\",\n  \"environment\": \"staging\",\n  \"state\": \"live\",\n  \"defaultValue\": true\n}"
+                },
+                "url": "{{baseUrl}}/flags"
+              }
+            },
+            {
+              "name": "Create in Prod",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key\": \"multi_env_feature\",\n  \"name\": \"Multi-Env Feature\",\n  \"environment\": \"prod\",\n  \"state\": \"live\",\n  \"defaultValue\": true\n}"
+                },
+                "url": "{{baseUrl}}/flags"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Evaluate Only Dev Environment",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"multi_env_feature\",\n  \"environment\": \"dev\",\n  \"context\": {\n    \"userId\": \"dev_user\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "Check Stale Flags - Should Show Staging & Prod",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 8 - Complete Lifecycle Demo",
+      "item": [
+        {
+          "name": "1. Create Draft Flag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('lifecycleFlagId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"lifecycle_demo\",\n  \"name\": \"Lifecycle Demo Feature\",\n  \"environment\": \"prod\",\n  \"state\": \"draft\",\n  \"defaultValue\": false\n}"
+            },
+            "url": "{{baseUrl}}/flags"
+          }
+        },
+        {
+          "name": "2. Check Initial Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/stats"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Promote to Live",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"live\"\n}"
+            },
+            "url": "{{baseUrl}}/flags/{{lifecycleFlagId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Evaluate Flag (Generate Activity)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flagKey\": \"lifecycle_demo\",\n  \"environment\": \"prod\",\n  \"context\": {\n    \"userId\": \"lifecycle_user\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/evaluate"
+          }
+        },
+        {
+          "name": "5. Wait & Check Stale Status (Manual Step)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Mark as Deprecated",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"deprecated\"\n}"
+            },
+            "url": "{{baseUrl}}/flags/{{lifecycleFlagId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "7. Final Stats Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/flags/stats"
+          },
+          "response": []
+        },
+        {
+          "name": "8. Delete Flag (Cleanup)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{lifecycleFlagId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scenario 9 - Edge Cases",
+      "item": [
+        {
+          "name": "Get Stale Flags - 0 Days (Should Return All)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - 365 Days (Should Return Empty)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=365",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "365"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - Invalid Days (Negative)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=-5",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "-5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stale Flags - Invalid Days (String)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/flags/stale?days=invalid",
+              "host": ["{{baseUrl}}"],
+              "path": ["flags", "stale"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "invalid"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cleanup - Delete Test Flags",
+      "item": [
+        {
+          "name": "Delete Active Flag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{activeFlagId}}"
+          }
+        },
+        {
+          "name": "Delete Stale Flag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{staleFlagId}}"
+          }
+        },
+        {
+          "name": "Delete Never Evaluated Flag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/flags/{{neverEvaluatedId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

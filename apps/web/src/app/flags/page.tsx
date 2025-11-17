@@ -50,6 +50,19 @@ export default function FlagsPage() {
     return new Date(date).toLocaleString();
   };
 
+  const getDaysSinceEvaluation = (lastEvaluatedAt: string | null): number | null => {
+    if (!lastEvaluatedAt) return null;
+    return Math.floor(
+      (Date.now() - new Date(lastEvaluatedAt).getTime()) / (1000 * 60 * 60 * 24)
+    );
+  };
+
+  const isStale = (flag: Flag): boolean => {
+    if (!flag.lastEvaluatedAt) return true;
+    const days = getDaysSinceEvaluation(flag.lastEvaluatedAt);
+    return days !== null && days > 30;
+  };
+
   if (loading) {
     return <div className="text-center py-12">Loading flags...</div>;
   }
@@ -123,7 +136,21 @@ export default function FlagsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {formatDate(flag.lastEvaluatedAt)}
+                    <div className="flex items-center space-x-2">
+                      <span>{formatDate(flag.lastEvaluatedAt)}</span>
+                      {isStale(flag) && (
+                        <span
+                          className="text-yellow-600"
+                          title={
+                            !flag.lastEvaluatedAt
+                              ? 'Never evaluated'
+                              : `${getDaysSinceEvaluation(flag.lastEvaluatedAt)} days since last evaluation`
+                          }
+                        >
+                          ⚠️
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <a

@@ -10,6 +10,9 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   ValidationPipe,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { FlagsService } from './flags.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
@@ -23,6 +26,18 @@ export class FlagsController {
   @HttpCode(HttpStatus.CREATED)
   create(@Body(ValidationPipe) createFlagDto: CreateFlagDto) {
     return this.flagsService.create(createFlagDto);
+  }
+
+  @Get('stale')
+  findStaleFlags(
+    @Query('days', new DefaultValuePipe(30), ParseIntPipe) days: number,
+  ) {
+    return this.flagsService.findStaleFlags(days);
+  }
+
+  @Get('stats')
+  getStats() {
+    return this.flagsService.getStats();
   }
 
   @Get()
@@ -49,4 +64,3 @@ export class FlagsController {
     await this.flagsService.remove(id);
   }
 }
-
