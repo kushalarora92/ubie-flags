@@ -2,10 +2,11 @@
 
 *A lightweight, explainable feature flag platform (MVP)*
 
-This repository contains a **full-stack monorepo** implementing the MVP for a feature flag management system inspired by LaunchDarkly — with two core differentiators:
+This repository contains a **full-stack monorepo** implementing the MVP for a feature flag management system inspired by LaunchDarkly — with three core differentiators:
 
 1. **Explainable feature flag evaluations**
 2. **Lifecycle & hygiene visibility (e.g., last evaluated, stale flags)**
+3. **Non-technical friendly rule builder & templates**
 
 The project includes:
 
@@ -70,7 +71,7 @@ The development environment uses **Docker Compose** to run:
 
 * Postgres (db)
 * Nest API (hot reload)
-* Next Web (optional: can run locally or in Docker)
+* Next Web (hot reload)
 
 ### 🔥 Start everything:
 
@@ -83,7 +84,7 @@ This:
 * Builds missing images (only on first run)
 * Installs dependencies inside containers (if needed)
 * Starts API with `npm run start:dev`
-* Starts Web with `npm run dev` (if enabled)
+* Starts Web with `npm run dev`
 * Starts Postgres with a persistent volume
 
 Access web app:
@@ -118,7 +119,7 @@ NODE_ENV=development
 ### Web
 
 ```
-NEXT_PUBLIC_API_URL=http://api:3000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 (Next.js uses `NEXT_PUBLIC_` prefix for client-visible envs.)
@@ -167,6 +168,27 @@ The API also updates `last_evaluated_at`.
 
 # 🧪 Testing the API
 
+### 📬 Postman Collection
+
+A full feature-wise Postman collections are included under:
+
+```
+/postman-collections/
+```
+
+It provides ready-made requests for:
+
+* Creating feature flags
+* Listing flags
+* Fetching a single flag
+* Evaluating flags (`/evaluate`)
+* Testing rule-matching scenarios
+* Inspecting explanation objects
+
+Import the JSON file into Postman to get started immediately.
+
+---
+
 Example request:
 
 ```json
@@ -191,75 +213,25 @@ Example response:
 }
 ```
 
-### 📬 Postman Collection
-
-A full feature-wise Postman collections are included under:
-
-```
-/postman-collections/
-```
-
-It provides ready-made requests for:
-
-* Creating feature flags
-* Listing flags
-* Fetching a single flag
-* Evaluating flags (`/evaluate`)
-* Testing rule-matching scenarios
-* Inspecting explanation objects
-
-Import the JSON file into Postman to get started immediately.
-
----
-
-# 🛠 Tech Stack
-
-### Backend
-
-* 🚀 NestJS
-* 🟦 TypeScript
-* 🗄️ PostgreSQL
-* 🔗 TypeORM
-* 📦 Docker
-
-### Frontend
-
-* ⚛️ Next.js
-* 🟦 TypeScript
-
 ---
 
 # 🧭 Development Philosophy (MVP)
 
 We intentionally *did not* implement:
 
-* Real-time flag propagation
 * SDKs
+* Authentication/RBAC/SSO
 * Custom environments
-* RBAC/SSO
-* Multivariate experiments
+* Metrics dashboard
 * Polished UI
+* Automated lifecycle transitions
 
 The MVP exists to validate:
 
 * Explainability improves debugging
 * Lifecycle metadata helps flag hygiene
-
----
-
-# 📌 Commands Summary
-
-### Start dev stack
-
-```bash
-make up
-```
-
-### Stop dev stack
-
-```bash
-make down
-```
+* Ability to create / update feature flags and simulate user behavior
+* Usability of flag creation examples and Evaluation test scenarios
 
 ---
 
