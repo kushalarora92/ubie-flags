@@ -145,8 +145,8 @@ export default function NewFlagPage() {
             label="Default Value"
             required
             options={[
-              { value: 'false', label: 'false' },
-              { value: 'true', label: 'true' },
+              { value: 'false', label: 'OFF' },
+              { value: 'true', label: 'ON' },
             ]}
             value={formData.defaultValue ? 'true' : 'false'}
             onChange={(value) => setFormData({ ...formData, defaultValue: value === 'true' })}

@@ -146,7 +146,7 @@ export default function DemoPage() {
         userId: 'user123',
         country: 'CA',
       }, null, 2),
-      expectedOutcome: '✓ Result: TRUE | Explanation: "Condition matched: country == CA"',
+      expectedOutcome: '✓ Result: ON | Explanation: "Condition matched: country == CA"',
       link: '/evaluate',
     },
     {
@@ -162,7 +162,7 @@ export default function DemoPage() {
         userId: 'user456',
         country: 'US',
       }, null, 2),
-      expectedOutcome: '✗ Result: FALSE | Explanation shows condition didn\'t match',
+      expectedOutcome: '✗ Result: OFF | Explanation shows condition didn\'t match',
       link: '/evaluate',
     },
     {
@@ -179,7 +179,7 @@ export default function DemoPage() {
         country: 'CA',
         role: 'beta_tester',
       }, null, 2),
-      expectedOutcome: '✓ Result: TRUE | All AND conditions satisfied',
+      expectedOutcome: '✓ Result: ON | All AND conditions satisfied',
       link: '/evaluate',
     },
     {
@@ -196,7 +196,7 @@ export default function DemoPage() {
         country: 'CA',
         role: 'regular_user',
       }, null, 2),
-      expectedOutcome: '✗ Result: FALSE | AND requires all conditions to match',
+      expectedOutcome: '✗ Result: OFF | AND requires all conditions to match',
       link: '/evaluate',
     },
     {
@@ -231,7 +231,7 @@ export default function DemoPage() {
         role: 'user',
         email: 'john@company.com',
       }, null, 2),
-      expectedOutcome: '✓ Result: TRUE | Only needs one condition (email matches)',
+      expectedOutcome: '✓ Result: ON | Only needs one condition (email matches)',
       link: '/flags/new',
     },
     {
@@ -254,7 +254,7 @@ export default function DemoPage() {
       sampleContext: JSON.stringify({
         userId: 'test_user_1',
       }, null, 2),
-      expectedOutcome: '~50% of users see TRUE (consistent per userId)',
+      expectedOutcome: '~50% of users see ON (consistent per userId)',
       link: '/flags/new',
     },
     {
@@ -328,7 +328,7 @@ export default function DemoPage() {
         userId: 'user_25',
         age: 25,
       }, null, 2),
-      expectedOutcome: '✓ Result: TRUE (25 >= 18)',
+      expectedOutcome: '✓ Result: ON (25 >= 18)',
       link: '/flags/new',
     },
     {
@@ -356,7 +356,7 @@ export default function DemoPage() {
         userId: 'employee_1',
         email: 'john@company.com',
       }, null, 2),
-      expectedOutcome: '✓ Result: TRUE (email ends with @company.com)',
+      expectedOutcome: '✓ Result: ON (email ends with @company.com)',
       link: '/flags/new',
     },
   ];

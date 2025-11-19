@@ -26,7 +26,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
   const scenarios: EvaluationScenario[] = [
     {
       id: 'country-match',
-      name: 'Country Match (TRUE)',
+      name: 'Country Match (ON)',
       description: 'User from Canada matches country condition',
       category: 'Basic Conditions',
       flagKey: 'canada_feature',
@@ -40,7 +40,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'country-no-match',
-      name: 'Country No Match (FALSE)',
+      name: 'Country No Match (OFF)',
       description: 'User from US does not match CA condition',
       category: 'Basic Conditions',
       flagKey: 'canada_feature',
@@ -54,7 +54,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'and-both-match',
-      name: 'AND Logic - Both Match (TRUE)',
+      name: 'AND Logic - Both Match (ON)',
       description: 'Both country AND role conditions are satisfied',
       category: 'AND Operator',
       flagKey: 'beta_access',
@@ -69,7 +69,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'and-partial-match',
-      name: 'AND Logic - Partial Match (FALSE)',
+      name: 'AND Logic - Partial Match (OFF)',
       description: 'Only one of two AND conditions matches',
       category: 'AND Operator',
       flagKey: 'beta_access',
@@ -84,7 +84,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'and-no-match',
-      name: 'AND Logic - No Match (FALSE)',
+      name: 'AND Logic - No Match (OFF)',
       description: 'Neither condition matches',
       category: 'AND Operator',
       flagKey: 'beta_access',
@@ -99,7 +99,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'or-first-match',
-      name: 'OR Logic - First Condition (TRUE)',
+      name: 'OR Logic - First Condition (ON)',
       description: 'First condition matches (admin role)',
       category: 'OR Operator',
       flagKey: 'special_access',
@@ -114,7 +114,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'or-second-match',
-      name: 'OR Logic - Second Condition (TRUE)',
+      name: 'OR Logic - Second Condition (ON)',
       description: 'Second condition matches (company email)',
       category: 'OR Operator',
       flagKey: 'special_access',
@@ -129,7 +129,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'or-both-match',
-      name: 'OR Logic - Both Match (TRUE)',
+      name: 'OR Logic - Both Match (ON)',
       description: 'Both conditions match',
       category: 'OR Operator',
       flagKey: 'special_access',
@@ -144,7 +144,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'or-no-match',
-      name: 'OR Logic - No Match (FALSE)',
+      name: 'OR Logic - No Match (OFF)',
       description: 'No conditions match',
       category: 'OR Operator',
       flagKey: 'special_access',
@@ -198,7 +198,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'targeted-rollout-wrong-country',
-      name: 'Targeted Rollout - Wrong Country (FALSE)',
+      name: 'Targeted Rollout - Wrong Country (OFF)',
       description: 'Country condition fails, rollout not checked',
       category: 'Combined Logic',
       flagKey: 'targeted_rollout',
@@ -226,7 +226,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'age-above',
-      name: 'Age Check - Above Threshold (TRUE)',
+      name: 'Age Check - Above Threshold (ON)',
       description: 'User age 25 >= 18',
       category: 'Numeric Operators',
       flagKey: 'age_restricted',
@@ -240,7 +240,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'age-exact',
-      name: 'Age Check - Exact Threshold (TRUE)',
+      name: 'Age Check - Exact Threshold (ON)',
       description: 'User age exactly 18',
       category: 'Numeric Operators',
       flagKey: 'age_restricted',
@@ -254,7 +254,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'age-below',
-      name: 'Age Check - Below Threshold (FALSE)',
+      name: 'Age Check - Below Threshold (OFF)',
       description: 'User age 16 < 18',
       category: 'Numeric Operators',
       flagKey: 'age_restricted',
@@ -268,7 +268,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'score-high',
-      name: 'Score Check - High Score (TRUE)',
+      name: 'Score Check - High Score (ON)',
       description: 'Score 150 > 100',
       category: 'Numeric Operators',
       flagKey: 'premium_features',
@@ -282,7 +282,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'score-low',
-      name: 'Score Check - Low Score (FALSE)',
+      name: 'Score Check - Low Score (OFF)',
       description: 'Score 50 <= 100',
       category: 'Numeric Operators',
       flagKey: 'premium_features',
@@ -296,7 +296,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'email-internal',
-      name: 'Email Domain - Internal (TRUE)',
+      name: 'Email Domain - Internal (ON)',
       description: 'Email ends with @company.com',
       category: 'String Operators',
       flagKey: 'internal_features',
@@ -310,7 +310,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'email-external',
-      name: 'Email Domain - External (FALSE)',
+      name: 'Email Domain - External (OFF)',
       description: 'Email does not end with @company.com',
       category: 'String Operators',
       flagKey: 'internal_features',
@@ -324,7 +324,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'username-admin',
-      name: 'Username Pattern - Admin (TRUE)',
+      name: 'Username Pattern - Admin (ON)',
       description: 'Username starts with admin_',
       category: 'String Operators',
       flagKey: 'admin_panel',
@@ -338,7 +338,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'username-regular',
-      name: 'Username Pattern - Regular (FALSE)',
+      name: 'Username Pattern - Regular (OFF)',
       description: 'Username does not start with admin_',
       category: 'String Operators',
       flagKey: 'admin_panel',
@@ -352,7 +352,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'tags-contains',
-      name: 'Array Contains - VIP Tag (TRUE)',
+      name: 'Array Contains - VIP Tag (ON)',
       description: 'Tags array contains "vip"',
       category: 'Array Operators',
       flagKey: 'vip_features',
@@ -366,7 +366,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'tags-no-contains',
-      name: 'Array Contains - No VIP Tag (FALSE)',
+      name: 'Array Contains - No VIP Tag (OFF)',
       description: 'Tags array does not contain "vip"',
       category: 'Array Operators',
       flagKey: 'vip_features',
@@ -380,7 +380,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'country-in-list',
-      name: 'IN Operator - Country in List (TRUE)',
+      name: 'IN Operator - Country in List (ON)',
       description: 'Country is in the allowed list',
       category: 'List Operators',
       flagKey: 'north_america_feature',
@@ -394,7 +394,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'country-not-in-list',
-      name: 'IN Operator - Country Not in List (FALSE)',
+      name: 'IN Operator - Country Not in List (OFF)',
       description: 'Country is not in the allowed list',
       category: 'List Operators',
       flagKey: 'north_america_feature',
@@ -408,7 +408,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'country-exclude',
-      name: 'NOT_IN Operator - Not Excluded (TRUE)',
+      name: 'NOT_IN Operator - Not Excluded (ON)',
       description: 'Country is not in restricted list',
       category: 'List Operators',
       flagKey: 'global_feature',
@@ -422,7 +422,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
     },
     {
       id: 'country-excluded',
-      name: 'NOT_IN Operator - Excluded (FALSE)',
+      name: 'NOT_IN Operator - Excluded (OFF)',
       description: 'Country is in restricted list',
       category: 'List Operators',
       flagKey: 'global_feature',
@@ -518,7 +518,7 @@ export default function EvaluationExamples({ onUseScenario }: EvaluationExamples
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
-                        {scenario.expectedResult ? '✓ TRUE' : '✗ FALSE'}
+                        {scenario.expectedResult ? '✓ ON' : '✗ OFF'}
                       </span>
                     </div>
                     <span className="text-xs text-gray-500">{scenario.category}</span>

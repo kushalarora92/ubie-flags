@@ -115,9 +115,9 @@ export default function FlagDetailsPage() {
               <span className="text-sm font-medium text-gray-500">Default Value</span>
               <p className="mt-1 text-gray-900">
                 {flag.defaultValue ? (
-                  <span className="text-green-600 font-semibold">true</span>
+                  <span className="text-green-600 font-semibold">ON</span>
                 ) : (
-                  <span className="text-red-600 font-semibold">false</span>
+                  <span className="text-red-600 font-semibold">OFF</span>
                 )}
               </p>
             </div>
