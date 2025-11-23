@@ -8,5 +8,6 @@ import { FeatureFlag } from '../entities/feature-flag.entity';
   imports: [TypeOrmModule.forFeature([FeatureFlag])],
   controllers: [EvaluationController],
   providers: [EvaluationService],
+  exports: [EvaluationService],
 })
 export class EvaluationModule {}

@@ -1,12 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FlagsModule } from './flags/flags.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', '../.env', '../../.env'],
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -20,6 +26,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
     }),
     FlagsModule,
     EvaluationModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
