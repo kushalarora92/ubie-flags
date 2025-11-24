@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FlagsModule } from './flags/flags.module';
@@ -13,6 +15,12 @@ import { ChatModule } from './chat/chat.module';
       isGlobal: true,
       envFilePath: ['.env', '../.env', '../../.env'],
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // Time window in milliseconds (60 seconds)
+        limit: 20, // Max requests per ttl window
+      },
+    ]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -29,6 +37,12 @@ import { ChatModule } from './chat/chat.module';
     ChatModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
