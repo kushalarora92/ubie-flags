@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { FlagsModule } from './flags/flags.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
 import { ChatModule } from './chat/chat.module';
+import { ChatAgentModule } from './chat-agent/chat-agent.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ChatModule } from './chat/chat.module';
     FlagsModule,
     EvaluationModule,
     ChatModule,
+    ChatAgentModule,
   ],
   controllers: [AppController],
   providers: [

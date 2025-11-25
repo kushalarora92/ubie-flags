@@ -1,0 +1,31 @@
+diff --git a/node_modules/@langchain/core/dist/runnables/base.cjs b/node_modules/@langchain/core/dist/runnables/base.cjs
+index a60679a..d83e918 100644
+--- a/node_modules/@langchain/core/dist/runnables/base.cjs
++++ b/node_modules/@langchain/core/dist/runnables/base.cjs
+@@ -16,7 +16,10 @@ const require_runnables_graph = require('./graph.cjs');
+ const require_wrappers = require('./wrappers.cjs');
+ const require_iter = require('./iter.cjs');
+ const zod_v3 = require_rolldown_runtime.__toESM(require("zod/v3"));
+-const p_retry = require_rolldown_runtime.__toESM(require("p-retry"));
++let p_retry = null;
++(async ()=>{
++    p_retry = await import('p-retry');
++})();
+ const uuid = require_rolldown_runtime.__toESM(require("uuid"));
+ const langsmith_singletons_traceable = require_rolldown_runtime.__toESM(require("langsmith/singletons/traceable"));
+ 
+diff --git a/node_modules/@langchain/core/dist/utils/async_caller.cjs b/node_modules/@langchain/core/dist/utils/async_caller.cjs
+index 7109b1e..b8f98d6 100644
+--- a/node_modules/@langchain/core/dist/utils/async_caller.cjs
++++ b/node_modules/@langchain/core/dist/utils/async_caller.cjs
+@@ -1,6 +1,9 @@
+ const require_rolldown_runtime = require('../_virtual/rolldown_runtime.cjs');
+ const require_signal = require('./signal.cjs');
+-const p_retry = require_rolldown_runtime.__toESM(require("p-retry"));
++let p_retry = null;
++(async ()=>{
++    p_retry = await import('p-retry');
++})();
+ const p_queue = require_rolldown_runtime.__toESM(require("p-queue"));
+ 
+ //#region src/utils/async_caller.ts

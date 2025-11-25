@@ -13,13 +13,15 @@
     "lint": "npm run lint --workspaces",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
     "format": "npm run format --workspaces --if-present",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "patch-package"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.6"
+    "lint-staged": "^16.2.6",
+    "patch-package": "^8.0.1"
   }
 }
