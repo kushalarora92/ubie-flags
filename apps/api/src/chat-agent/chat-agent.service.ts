@@ -4,10 +4,12 @@ import { tool } from 'langchain';
 import { createAgent } from 'langchain';
 import { ChatOpenAI } from '@langchain/openai';
 import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 import { FlagsService } from '../flags/flags.service';
 import { EvaluationService } from '../evaluation/evaluation.service';
-import { ChatMessageDto } from './dto/chat-agent-message.dto';
+import { ConversationService } from '../conversation/conversation.service';
 import { Environment } from '../entities/feature-flag.entity';
+import { MessageRole } from '../entities/conversation-message.entity';
 
 @Injectable()
 export class ChatAgentService implements OnModuleInit {
@@ -18,6 +20,7 @@ export class ChatAgentService implements OnModuleInit {
     private configService: ConfigService,
     private flagsService: FlagsService,
     private evaluationService: EvaluationService,
+    private conversationService: ConversationService,
   ) {}
 
   async onModuleInit() {
@@ -215,19 +218,34 @@ Be concise, friendly, and technical when needed.`;
 
   /**
    * Send a message to the agent and get a response
+   * Now with persistent conversation storage
    */
   async sendMessage(
     message: string,
-    conversationHistory: ChatMessageDto[],
-  ): Promise<{ message: string; conversationHistory: ChatMessageDto[] }> {
+    threadId?: string,
+  ): Promise<{ message: string; threadId: string }> {
     try {
       if (!this.agent) {
         throw new Error('Agent not initialized');
       }
 
-      // Build messages array with conversation history
+      // Generate threadId if not provided
+      const conversationThreadId = threadId || uuidv4();
+
+      // Find or create conversation
+      await this.conversationService.findOrCreateConversation(
+        conversationThreadId,
+      );
+
+      // Load conversation history from database
+      const history =
+        await this.conversationService.getConversationHistory(
+          conversationThreadId,
+        );
+
+      // Format messages for LangChain
       const messages = [
-        ...conversationHistory.map((msg) => ({
+        ...history.map((msg) => ({
           role: msg.role,
           content: msg.content,
         })),
@@ -246,14 +264,25 @@ Be concise, friendly, and technical when needed.`;
           ? lastMessage.content
           : JSON.stringify(lastMessage.content);
 
-      // Return in same format as chat module
+      // Save user message to database
+      await this.conversationService.saveMessage(
+        conversationThreadId,
+        MessageRole.USER,
+        message,
+      );
+
+      // Save AI response to database
+      await this.conversationService.saveMessage(
+        conversationThreadId,
+        MessageRole.ASSISTANT,
+        agentResponse,
+        lastMessage.tool_calls || null,
+      );
+
+      // Return response with threadId
       return {
         message: agentResponse,
-        conversationHistory: [
-          ...conversationHistory,
-          { role: 'user', content: message },
-          { role: 'assistant', content: agentResponse },
-        ],
+        threadId: conversationThreadId,
       };
     } catch (error) {
       this.logger.error('Agent invocation failed:', error);

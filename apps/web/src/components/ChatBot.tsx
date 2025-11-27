@@ -17,7 +17,52 @@ export function ChatBot({ isOpen, onClose }: ChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load threadId from sessionStorage and fetch conversation history
+  useEffect(() => {
+    const savedThreadId = sessionStorage.getItem('chatbot-thread-id');
+
+    if (savedThreadId) {
+      setThreadId(savedThreadId);
+      fetchConversationHistory(savedThreadId);
+    }
+  }, []);
+
+  // Fetch conversation history from backend
+  const fetchConversationHistory = async (tid: string) => {
+    setIsLoadingHistory(true);
+    try {
+      const response = await fetch(
+        `http://localhost:3001/chat-agent/conversations/${tid}/history`,
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Map backend messages to frontend format
+        const mappedMessages: Message[] = data.messages.map(
+          (msg: { role: string; content: string }) => ({
+            role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
+            content: msg.content,
+          }),
+        );
+        setMessages(mappedMessages);
+      }
+    } catch (error) {
+      console.error('Failed to fetch conversation history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  // Save threadId to sessionStorage when it changes
+  useEffect(() => {
+    if (threadId) {
+      sessionStorage.setItem('chatbot-thread-id', threadId);
+    }
+  }, [threadId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -33,14 +78,14 @@ export function ChatBot({ isOpen, onClose }: ChatBotProps) {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/chat/message', {
+      const response = await fetch('http://localhost:3001/chat-agent/message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           message: userMessage,
-          conversationHistory: messages,
+          threadId: threadId || undefined, // Send threadId if we have one
         }),
       });
 
@@ -50,7 +95,16 @@ export function ChatBot({ isOpen, onClose }: ChatBotProps) {
 
       const data = await response.json();
 
-      setMessages(data.conversationHistory);
+      // Store threadId for subsequent messages
+      if (data.threadId) {
+        setThreadId(data.threadId);
+      }
+
+      // Add assistant response to messages
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.message },
+      ]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -73,6 +127,8 @@ export function ChatBot({ isOpen, onClose }: ChatBotProps) {
 
   const handleClear = () => {
     setMessages([]);
+    setThreadId(null);
+    sessionStorage.removeItem('chatbot-thread-id');
   };
 
   if (!isOpen) return null;
@@ -86,12 +142,18 @@ export function ChatBot({ isOpen, onClose }: ChatBotProps) {
             <h2 className="text-xl font-bold">UbieFlags Assistant</h2>
             <p className="text-sm text-blue-100">
               Ask me anything about your feature flags
+              {threadId && (
+                <span className="ml-2 text-xs bg-blue-500 px-2 py-0.5 rounded">
+                  💾 Conversation saved
+                </span>
+              )}
             </p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={handleClear}
               className="px-3 py-1 bg-blue-700 hover:bg-blue-800 rounded text-sm"
+              title="Start a new conversation"
             >
               Clear
             </button>
@@ -106,7 +168,14 @@ export function ChatBot({ isOpen, onClose }: ChatBotProps) {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-          {messages.length === 0 && (
+          {isLoadingHistory && (
+            <div className="text-center text-gray-500 mt-8">
+              <div className="text-2xl mb-2">⏳</div>
+              <p>Loading conversation...</p>
+            </div>
+          )}
+
+          {!isLoadingHistory && messages.length === 0 && (
             <div className="text-center text-gray-500 mt-8">
               <div className="text-4xl mb-4">💬</div>
               <p className="mb-2">Hi! I&apos;m your feature flag assistant.</p>

@@ -9,6 +9,7 @@ import { FlagsModule } from './flags/flags.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
 import { ChatModule } from './chat/chat.module';
 import { ChatAgentModule } from './chat-agent/chat-agent.module';
+import { ConversationModule } from './conversation/conversation.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ChatAgentModule } from './chat-agent/chat-agent.module';
     EvaluationModule,
     ChatModule,
     ChatAgentModule,
+    ConversationModule,
   ],
   controllers: [AppController],
   providers: [

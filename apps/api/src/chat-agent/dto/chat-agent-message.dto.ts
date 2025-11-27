@@ -19,6 +19,10 @@ export class SendMessageDto {
   @IsString()
   message: string;
 
+  @IsString()
+  @IsOptional()
+  threadId?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ChatMessageDto)
@@ -31,5 +35,6 @@ export class SendMessageDto {
  */
 export class ChatResponseDto {
   message: string;
-  conversationHistory: ChatMessageDto[];
+  threadId: string;
+  conversationHistory?: ChatMessageDto[];
 }
