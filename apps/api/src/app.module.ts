@@ -10,6 +10,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
 import { ChatModule } from './chat/chat.module';
 import { ChatAgentModule } from './chat-agent/chat-agent.module';
 import { ConversationModule } from './conversation/conversation.module';
+import { SemanticModule } from './semantic/semantic.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ConversationModule } from './conversation/conversation.module';
     ChatModule,
     ChatAgentModule,
     ConversationModule,
+    SemanticModule,
   ],
   controllers: [AppController],
   providers: [

@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FlagsService } from '../flags/flags.service';
 import { EvaluationService } from '../evaluation/evaluation.service';
 import { ConversationService } from '../conversation/conversation.service';
+import { SemanticService } from '../semantic/semantic.service';
 import { Environment } from '../entities/feature-flag.entity';
 import { MessageRole } from '../entities/conversation-message.entity';
 
@@ -21,6 +22,7 @@ export class ChatAgentService implements OnModuleInit {
     private flagsService: FlagsService,
     private evaluationService: EvaluationService,
     private conversationService: ConversationService,
+    private semanticService: SemanticService,
   ) {}
 
   async onModuleInit() {
@@ -49,6 +51,7 @@ Your role:
 - Explain why flags evaluate to ON or OFF (never say true/false)
 - Use available tools to fetch real data
 - Provide clear, concise explanations
+- Answer questions about UbieFlags features and best practices
 
 When explaining evaluations:
 - Always say ON or OFF (never true or false)
@@ -56,7 +59,14 @@ When explaining evaluations:
 - Explain the reasoning clearly
 - Use ✓ for matched conditions and ✗ for unmatched
 
-Available tools: list_flags, get_flag_details, evaluate_flag, list_stale_flags
+Available tools:
+- list_flags: Get all feature flags
+- get_flag_details: Get details about a specific flag
+- evaluate_flag: Evaluate a flag for a user context
+- list_stale_flags: Find flags not evaluated recently
+- retrieve_documentation: Search UbieFlags documentation for features, best practices, troubleshooting
+
+Use retrieve_documentation for questions about how UbieFlags works, features, best practices, or troubleshooting.
 
 Be concise, friendly, and technical when needed.`;
 
@@ -68,6 +78,7 @@ Be concise, friendly, and technical when needed.`;
           this.createGetFlagDetailsTool(),
           this.createEvaluateFlagTool(),
           this.createListStaleFlagsTool(),
+          this.createRetrieveDocumentationTool(),
         ],
         systemPrompt,
       });
@@ -211,6 +222,38 @@ Be concise, friendly, and technical when needed.`;
             .number()
             .optional()
             .describe('Days since last evaluation (default 30)'),
+        }),
+      },
+    );
+  }
+
+  /**
+   * Tool 5: Retrieve documentation
+   */
+  private createRetrieveDocumentationTool() {
+    return tool(
+      async ({ query }) => {
+        const docs = await this.semanticService.similaritySearch(query, 3);
+
+        // Format results for the agent
+        const formatted = docs.map((doc) => ({
+          content: doc.pageContent,
+          category: doc.metadata.category || 'general',
+          title: doc.metadata.title || 'Documentation',
+        }));
+
+        return JSON.stringify(formatted, null, 2);
+      },
+      {
+        name: 'retrieve_documentation',
+        description:
+          'Search UbieFlags documentation for information about features, best practices, and troubleshooting. Use this when users ask how something works or need guidance.',
+        schema: z.object({
+          query: z
+            .string()
+            .describe(
+              'Search query for documentation (e.g., "explainability", "lifecycle", "best practices")',
+            ),
         }),
       },
     );
